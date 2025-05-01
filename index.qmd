@@ -217,7 +217,6 @@ performance_top_10 <- cantril %>%
   arrange(`Year`,`Cantril ladder score`) %>%
   head(n = 10)
 reactable(performance_top_10)
-#merge_top_bottom <- bind_rows(performance_top_10, performance_bottom_10)
 ```
 
 **Bottom 10 countries in 2023**
@@ -229,6 +228,25 @@ performance_bottom_10 <- cantril %>%
   head(n = 10)
 reactable(performance_bottom_10)
 #performance_bottom_10
+```
+
+```{r}
+merge_top_bottom <- bind_rows(performance_top_10, performance_bottom_10)
+merge_top_bottom
+```
+
+```{r}
+  top_bottom_chart <- merge_top_bottom %>%
+  ggplot(mapping = aes(x = `Cantril ladder score`,
+                       y = Country))+
+  geom_bar()+
+  #scale_y_continuous(limits = c(0,10)) +
+  #labs(x = "Year",
+  #    y = "Cantril Ladder Score",
+  #   caption = "Data Source: World Hapiness Report")+
+  theme_minimal()
+#top_bottom_chart
+#ggplotly(top_bottom_chart)
 ```
 
 
