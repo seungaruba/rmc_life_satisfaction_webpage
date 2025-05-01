@@ -1,7 +1,7 @@
 ---
 title: "Self-reported life satisfaction, 2011 to 2023"
 subtitle: "Replicating the Our World in Data Grapher"
-author: "YOUR NAME HERE" # Remember to add your name!
+author: "Seun Garuba" 
 theme: united
 ---
 
@@ -44,7 +44,7 @@ The main life evaluation question asked in the poll is the Cantril Life Ladder q
 
 > “Please imagine a ladder, with steps numbered from 0 at the bottom to 10 at the top. The top of the ladder represents the best possible life for you and the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?”
 
-
+::: {.panel-tabset}
 ## 🔢 Table
 
 **Average self-reported life satisfaction** – Cantril Ladder score (0=worst; 10=best)
@@ -63,7 +63,26 @@ The main life evaluation question asked in the poll is the Cantril Life Ladder q
 # 5. Also with `mutate`, you should round your numbers to appropriate decimal places.
 # 6. Then use scales::percent to format the Relative change as a percentage.
 # 7. Use the `reactable` function to create and output the table.
-"WRITE_YOUR_CODE_HERE"
+
+cantril_mini <- cantril %>%
+  select(!Code) %>%
+  filter(Year == 2011 | Year == 2023) %>%
+  pivot_wider(id_cols = Country,
+              names_from = Year,
+              values_from = "Cantril ladder score")%>%
+  mutate(`Absolute change` = round(`2023` - `2011`, 2),
+         Relative_change = round((`2023` - `2011`)/`2011`, 2),
+         Relative_change1 = scales::percent(Relative_change, accuracy = 0.01,
+                                           suffix = "%"))
+reactable(cantril_mini)
+
+#         `2011` = round(`2011`, 2),
+#         2023 = round(`2011`, 2))
+
+#          Relative_change1 <- scales::percent(Relative_change, accuracy = 0.01,
+#                                           suffix = "%")
+#          Relative_change2 <- Relative_change1(Relative_change)
+# reactable(cantril_mini)
 ```
 
 
@@ -109,7 +128,20 @@ cantril %>%
 # 6. Use theme_minimal to set the theme.
 # 7. Finally, use ggplotly to convert the ggplot chart to a plotly chart
 
-"WRITE_YOUR_CODE_HERE"
+cantril_filter <- cantril %>%
+  filter(Country %in% c("South Africa", "Nigeria", "Cameroon", "Canada"))%>%
+  ggplot(mapping = aes(x = Year,
+                       y = `Cantril ladder score`,
+                       color = Country))+
+  geom_line()+
+  scale_y_continuous(limits = c(0,10)) +
+  labs(x = "Year",
+      y = "Cantril Ladder Score",
+      caption = "Data Source: World Hapiness Report")+
+  theme_minimal()
+ggplotly(cantril_filter)
+
+#cantril_filter
 # (When you're done with this section, don't forget to add tabsets, as mentioned in the instructions.)
 ```
 
@@ -172,6 +204,31 @@ window.onload = filter_default;
 
 # Add a final tab with a single figure that shows the top 10 and bottom 10 countries by happiness score in 2023. Remember to add a ## header and include it in the tabsets
 # "WRITE_YOUR_CODE_HERE"
+
+```
+
+## Top/Bottom Countries
+
+**Top 10 countries in 2023** 
+```{r}
+performance_top_10 <- cantril %>%
+  group_by(Country) %>%
+  filter(Year == 2023) %>%
+  arrange(`Year`,`Cantril ladder score`) %>%
+  head(n = 10)
+reactable(performance_top_10)
+#merge_top_bottom <- bind_rows(performance_top_10, performance_bottom_10)
+```
+
+**Bottom 10 countries in 2023**
+```{r}
+performance_bottom_10 <- cantril %>%
+  group_by(Country) %>%
+  filter(Year == 2023) %>%
+  arrange(desc(`Cantril ladder score`)) %>%
+  head(n = 10)
+reactable(performance_bottom_10)
+#performance_bottom_10
 ```
 
 
@@ -180,3 +237,5 @@ window.onload = filter_default;
 Data source: World Happiness Report
 
 [OurWorldInData.org/happiness-and-life-satisfaction](https://ourworldindata.org/grapher/happiness-cantril-ladder) | CC BY
+
+:::
